@@ -5,6 +5,7 @@ import connectDatabase from "./startup/connectDatabase.js";
 // Routes
 import registerRouter from "./routes/registerRouter.js";
 import loginRouter from "./routes/loginRouter.js";
+import chatsApiRouter from "./routes/api/chats.js";
 
 const app = express();
 
@@ -14,5 +15,6 @@ connectDatabase();
 // Registering the routers
 app.use("/register", registerRouter);
 app.use("/login", loginRouter);
+app.use("/api/chats", chatsApiRouter);
 
 export default app;

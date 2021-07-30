@@ -25,7 +25,7 @@ router.post("/", jsonParser, async (req, res, next) => {
 router.post("/me", auth, async (req, res, next) => {
 	try {
 		const user = await User.findById(req.user._id);
-		res.send({ data: user });
+		res.status(201).send({ data: user });
 	} catch (error) {
 		console.error("Error retrieving the current user ", error.message);
 		next(error);
