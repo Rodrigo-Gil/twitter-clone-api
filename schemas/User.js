@@ -1,8 +1,10 @@
 import mongoose from "mongoose";
+import uniqueValidator from "mongoose-unique-validator";
+import bcrypt from "bcrypt";
 
-const Schema = mongoose.Schema;
+const saltRounds = 14;
 
-const UserSchema = new Schema(
+const UserSchema = new mongoose.Schema(
 	{
 		firstName: { type: String, required: true, trim: true },
 		lastName: { type: String, required: true, trim: true },
@@ -11,13 +13,61 @@ const UserSchema = new Schema(
 		password: { type: String, required: true },
 		profilePic: { type: String, default: "/images/profilePic.jpeg" },
 		coverPhoto: { type: String },
-		likes: [{ type: Schema.Types.ObjectId, ref: "Post" }],
-		retweets: [{ type: Schema.Types.ObjectId, ref: "Post" }],
-		following: [{ type: Schema.Types.ObjectId, ref: "User" }],
-		followers: [{ type: Schema.Types.ObjectId, ref: "User" }],
+		likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post" }],
+		retweets: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post" }],
+		following: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+		followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
 	},
 	{ timestamps: true }
 );
+
+UserSchema.statics.authenticate = async function (email, password) {
+	const user = await this.findOne({ email: email });
+
+	const badHash = `$2b$${saltRounds}$invalidusernameaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa`;
+	const hashedPassword = user ? user.password : badHash;
+	const passwordDidMatch = await bcrypt.compare(password, hashedPassword);
+
+	return passwordDidMatch ? user : null;
+};
+
+UserSchema.pre("save", async function (next) {
+	// Only encrypt if the password property is being changed.
+	if (!this.isModified("password")) return next();
+
+	this.password = await bcrypt.hash(this.password, saltRounds);
+	next();
+});
+
+UserSchema.pre("findOneAndUpdate", async function (next) {
+	//handling the password update
+	if (this._update.password) {
+		this._update.password = await bcrypt.hash(
+			this._update.password,
+			saltRounds
+		);
+	}
+	next();
+});
+
+//deleting sensitive information on json responses
+UserSchema.methods.toJSON = function () {
+	const obj = this.toObject();
+	delete obj.password;
+	delete obj.__v;
+	return obj;
+};
+
+//registering the validator plugin for the email
+UserSchema.plugin(uniqueValidator, {
+	message: function (props) {
+		if (props.path === "email") {
+			return `The email address '${props.value}' is already registered.`;
+		} else {
+			return `The ${props.path} must be unique. '${props.value}' is already in use.`;
+		}
+	},
+});
 
 const User = mongoose.model("User", UserSchema);
 export default User;
