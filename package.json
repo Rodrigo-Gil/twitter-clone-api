@@ -1,0 +1,25 @@
+{
+	"name": "twitter_clone_api",
+	"version": "1.0.0",
+	"description": "a twitter api clone",
+	"main": "app.js",
+	"type": "module",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"start": "node server.js"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/gil00013/twitter-clone-api.git"
+	},
+	"author": "Rodrigo Gil",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/gil00013/twitter-clone-api/issues"
+	},
+	"homepage": "https://github.com/gil00013/twitter-clone-api#readme",
+	"dependencies": {
+		"express": "^4.17.1",
+		"http": "0.0.1-security"
+	}
+}
