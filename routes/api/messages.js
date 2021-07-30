@@ -13,7 +13,7 @@ const jsonParser = bodyParser.json();
 const router = express.Router();
 
 router.post("/", auth, jsonParser, async (req, res, next) => {
-	if (!req.body.content || !req.body.chatId) {
+	if (!req.body.content || !req.body.chat) {
 		console.log("Invalid data passed into request");
 		return res.sendStatus(400);
 	}
@@ -21,7 +21,7 @@ router.post("/", auth, jsonParser, async (req, res, next) => {
 	const newMessage = {
 		sender: req.user._id,
 		content: req.body.content,
-		chat: req.body.chatId,
+		chat: req.body.chat,
 	};
 
 	Message.create(newMessage)
@@ -30,7 +30,7 @@ router.post("/", auth, jsonParser, async (req, res, next) => {
 			message = await message.populate("chat").execPopulate();
 			message = await User.populate(message, { path: "chat.users" });
 
-			await Chat.findByIdAndUpdate(req.body.chatId, {
+			await Chat.findByIdAndUpdate(req.body.chat, {
 				latestMessage: message,
 			}).catch(error => console.log(error));
 

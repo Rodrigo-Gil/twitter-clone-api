@@ -51,12 +51,12 @@ router.get("/", auth, async (req, res) => {
 });
 
 router.get("/:id", async (req, res) => {
-	const postId = req.params.id;
+	var postId = req.params.id;
 
-	const postData = await getPosts({ _id: postId });
+	var postData = await getPosts({ _id: postId });
 	postData = postData[0];
 
-	const results = {
+	var results = {
 		postData: postData,
 	};
 
@@ -134,19 +134,10 @@ router.put("/:id/like", auth, jsonParser, async (req, res) => {
 		res.sendStatus(400);
 	});
 
-	if (!isLiked) {
-		await Notification.insertNotification(
-			post.postedBy,
-			userId,
-			"postLike",
-			post._id
-		);
-	}
-
 	res.status(200).send(post);
 });
 
-router.post("/:id/retweet", auth, jsonParser, async (req, res) => {
+router.post("/:id/retweet", auth, async (req, res) => {
 	const postId = req.params.id;
 	const userId = req.user._id;
 
@@ -161,7 +152,7 @@ router.post("/:id/retweet", auth, jsonParser, async (req, res) => {
 
 	const option = deletedPost != null ? "$pull" : "$addToSet";
 
-	const repost = deletedPost;
+	var repost = deletedPost;
 
 	if (repost == null) {
 		repost = await Post.create({ postedBy: userId, retweetData: postId }).catch(
@@ -192,18 +183,10 @@ router.post("/:id/retweet", auth, jsonParser, async (req, res) => {
 		res.sendStatus(400);
 	});
 
-	if (!deletedPost) {
-		await Notification.insertNotification(
-			post.postedBy,
-			userId,
-			"retweet",
-			post._id
-		);
-	}
-
 	res.status(200).send(post);
 });
 
+//delete post
 router.delete("/:id", (req, res) => {
 	Post.findByIdAndDelete(req.params.id)
 		.then(() => res.sendStatus(202))
@@ -222,9 +205,8 @@ router.put("/:id", auth, jsonParser, async (req, res) => {
 			}
 		);
 	}
-
-	Post.findByIdAndUpdate(req.params.id, req.body)
-		.then(() => res.sendStatus(204))
+	await Post.findByIdAndUpdate(req.params.id, req.body)
+		.then(result => res.status(204).send(result))
 		.catch(error => {
 			console.log(error);
 			res.sendStatus(400);
@@ -232,7 +214,7 @@ router.put("/:id", auth, jsonParser, async (req, res) => {
 });
 
 async function getPosts(filter) {
-	const results = await Post.find(filter)
+	var results = await Post.find(filter)
 		.populate("postedBy")
 		.populate("retweetData")
 		.populate("replyTo")
