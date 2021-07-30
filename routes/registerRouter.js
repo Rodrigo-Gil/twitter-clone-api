@@ -20,6 +20,4 @@ router.post("/", jsonParser, async (req, res, next) => {
 	}
 });
 
-//login a user and return an authentication token
-
 export default router;

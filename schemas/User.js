@@ -1,8 +1,10 @@
 import mongoose from "mongoose";
 import uniqueValidator from "mongoose-unique-validator";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 const saltRounds = 14;
+const jwtSecretKey = "superSecretKey";
 
 const UserSchema = new mongoose.Schema(
 	{
@@ -10,7 +12,7 @@ const UserSchema = new mongoose.Schema(
 		lastName: { type: String, required: true, trim: true },
 		username: { type: String, required: true, trim: true, unique: true },
 		email: { type: String, required: true, trim: true, unique: true },
-		password: { type: String, required: true },
+		password: { type: String, maxLength: 70, required: true },
 		profilePic: { type: String, default: "/images/profilePic.jpeg" },
 		coverPhoto: { type: String },
 		likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post" }],
@@ -20,6 +22,12 @@ const UserSchema = new mongoose.Schema(
 	},
 	{ timestamps: true }
 );
+
+// Added a method to create a token for the loggedIn user
+UserSchema.methods.generateAuthToken = function () {
+	const payload = { uid: this._id };
+	return jwt.sign(payload, jwtSecretKey);
+};
 
 UserSchema.statics.authenticate = async function (email, password) {
 	const user = await this.findOne({ email: email });
