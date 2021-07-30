@@ -2,6 +2,7 @@ import express from "express";
 import bodyParser from "body-parser";
 
 import User from "../schemas/User.js";
+import auth from "../middleware/auth.js";
 
 //creating the jsonParser
 const jsonParser = bodyParser.json();
@@ -21,7 +22,7 @@ router.post("/", jsonParser, async (req, res, next) => {
 });
 
 //login the current user
-router.post("/me", jsonParser, async (req, res, next) => {
+router.post("/me", auth, async (req, res, next) => {
 	try {
 		const user = await User.findById(req.user._id);
 		res.send({ data: user });
