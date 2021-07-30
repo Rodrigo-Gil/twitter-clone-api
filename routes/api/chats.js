@@ -39,7 +39,7 @@ router.post("/", auth, jsonParser, async (req, res, next) => {
 	}
 });
 
-router.get("/", async (req, res, next) => {
+router.get("/", auth, async (req, res, next) => {
 	try {
 		Chat.find({ users: { $elemMatch: { $eq: req.user._id } } })
 			.populate("users")
@@ -71,7 +71,7 @@ router.get("/", async (req, res, next) => {
 	}
 });
 
-router.get("/:chatId", async (req, res, next) => {
+router.get("/:chatId", auth, async (req, res, next) => {
 	try {
 		Chat.findOne({
 			_id: req.params.chatId,
@@ -89,7 +89,7 @@ router.get("/:chatId", async (req, res, next) => {
 	}
 });
 
-router.put("/:chatId", jsonParser, async (req, res, next) => {
+router.put("/:chatId", auth, jsonParser, async (req, res, next) => {
 	try {
 		Chat.findByIdAndUpdate(req.params.chatId, req.body)
 			.then(results => res.sendStatus(204).send(results))
@@ -106,6 +106,7 @@ router.put("/:chatId", jsonParser, async (req, res, next) => {
 router.put(
 	"/:chatId/messages/markAsRead",
 	jsonParser,
+	auth,
 	async (req, res, next) => {
 		Message.updateMany(
 			{ chat: req.params.chatId },
