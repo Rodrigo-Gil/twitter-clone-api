@@ -4,12 +4,13 @@ import bodyParser from "body-parser";
 import User from "../../schemas/User.js";
 import Chat from "../../schemas/Chat.js";
 import Message from "../../schemas/Message.js";
-import router from "../registerRouter.js";
 
 import auth from "../../middleware/auth.js";
 
 //creating the jsonParser
 const jsonParser = bodyParser.json();
+
+const router = express.Router();
 
 router.post("/", auth, jsonParser, async (req, res, next) => {
 	if (!req.body.content || !req.body.chatId) {
