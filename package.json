@@ -20,6 +20,7 @@
 	"homepage": "https://github.com/gil00013/twitter-clone-api#readme",
 	"dependencies": {
 		"express": "^4.17.1",
-		"http": "0.0.1-security"
+		"http": "0.0.1-security",
+		"mongoose": "^5.13.4"
 	}
 }
